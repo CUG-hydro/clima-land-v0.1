@@ -1,8 +1,8 @@
 # CliMA Land v0.1
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://CUG-hydro.github.io/clima-land-v0.1.jl/dev)
-[![CI](https://github.com/CUG-hydro/clima-land-v0.1.jl/actions/workflows/JuliaStable.yml/badge.svg)](https://github.com/CUG-hydro/clima-land-v0.1.jl/actions/workflows/JuliaStable.yml)
-[![Codecov](https://codecov.io/gh/CUG-hydro/clima-land-v0.1.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/CUG-hydro/clima-land-v0.1.jl)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://CUG-hydro.github.io/clima-land-v0.1/dev)
+[![CI](https://github.com/CUG-hydro/clima-land-v0.1/actions/workflows/JuliaStable.yml/badge.svg)](https://github.com/CUG-hydro/clima-land-v0.1/actions/workflows/JuliaStable.yml)
+[![Codecov](https://codecov.io/gh/CUG-hydro/clima-land-v0.1/branch/test/graph/badge.svg)](https://codecov.io/gh/CUG-hydro/clima-land-v0.1)
 
 
 The land component of CliMA ESM is moving towards broadband RT and big leaf modeling, which does not align with my research interest to make the land model more complicated but powerful, such as using remote sensing data to calibrate the model. Therefore, I create this new repository to continue my development.
