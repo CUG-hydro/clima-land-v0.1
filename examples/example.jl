@@ -308,17 +308,17 @@ function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinear
         end
     end
 
-    # calculate the SIF if there is sunlight
-    if _df_dir + _df_dif >= 10
-        update_sif!(spac)
-        dfr.SIF683 = SIF_WL(spac.can_rad, spac.wl_set, FT(682.5))
-        dfr.SIF740 = SIF_740(spac.can_rad, spac.wl_set)
-        dfr.SIF757 = SIF_WL(spac.can_rad, spac.wl_set, FT(758.7))
-        dfr.SIF771 = SIF_WL(spac.can_rad, spac.wl_set, FT(770.0))
-        dfr.NDVI = NDVI(spac.can_rad, spac.wl_set)
-        dfr.EVI = EVI(spac.can_rad, spac.wl_set)
-        dfr.NIRv = NIRv(spac.can_rad, spac.wl_set)
-    end
+    ## calculate the SIF if there is sunlight
+    # if _df_dir + _df_dif >= 10
+    #     update_sif!(spac)
+    #     dfr.SIF683 = SIF_WL(spac.can_rad, spac.wl_set, FT(682.5))
+    #     dfr.SIF740 = SIF_740(spac.can_rad, spac.wl_set)
+    #     dfr.SIF757 = SIF_WL(spac.can_rad, spac.wl_set, FT(758.7))
+    #     dfr.SIF771 = SIF_WL(spac.can_rad, spac.wl_set, FT(770.0))
+    #     dfr.NDVI = NDVI(spac.can_rad, spac.wl_set)
+    #     dfr.EVI = EVI(spac.can_rad, spac.wl_set)
+    #     dfr.NIRv = NIRv(spac.can_rad, spac.wl_set)
+    # end
 
     # save the total flux into the DataFrame
     dfr.F_H2O = T_VEG(spac)

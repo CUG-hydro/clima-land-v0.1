@@ -142,7 +142,7 @@ function leaf_photosynthesis!(
     rubisco_limited_rate!(photo_set, leaf);
     product_limited_rate!(photo_set, leaf, envir);
     leaf.Ag  = min(leaf.Ac, leaf.Aj, leaf.Ap);
-    leaf.An  = leaf.Ag - leaf.Rd;
+    leaf.An  = leaf.Ag - leaf.Rd # [μmol m⁻² s⁻¹]
     leaf.p_i = envir.p_a - leaf.An / leaf.g_lc * envir.p_atm * FT(1e-6);
     leaf.p_s = envir.p_a - leaf.An / leaf.g_bc * envir.p_atm * FT(1e-6);
 

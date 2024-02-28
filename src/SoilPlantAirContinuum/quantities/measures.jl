@@ -1,3 +1,6 @@
+# 1. 冠层分层
+# 2. 每层很多叶子
+
 """
     T_VEG(spac::SPACMono{FT}) where {FT<:AbstractFloat}
 
@@ -14,6 +17,8 @@ function T_VEG(spac::SPACMono{FT}) where {FT<:AbstractFloat}
 
     return t_veg / spac.ga
 end
+
+
 
 
 """

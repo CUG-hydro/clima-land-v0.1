@@ -20,8 +20,8 @@ function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinear
 
     # calculate leaf level flux per canopy layer
     for _i_can in 1:spac.n_canopy
-        _iEN = spac.envirs[_i_can]   # env
         _iPS = spac.plant_ps[_i_can] # CanopyLayer
+        _iEN = spac.envirs[_i_can]   # env
 
         # set gsw to 0 or iterate for 30 times to find steady state solution
         if _df_dir + _df_dif < 10
@@ -53,8 +53,8 @@ function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinear
     end
 
     # save the total flux into the DataFrame
-    dfr.F_H2O = T_VEG(spac)
-    dfr.F_CO2 = CNPP(spac)
+    dfr.F_H2O = T_VEG(spac) # transpiration
+    dfr.F_CO2 = CNPP(spac) # net photosynthesis
     dfr.F_GPP = GPP(spac)
 
     return nothing
