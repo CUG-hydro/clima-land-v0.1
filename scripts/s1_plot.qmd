@@ -1,0 +1,70 @@
+# 1. 转模型
+```{julia}
+using Revise
+includet("main_pkgs.jl")
+using RTableTools
+# using NCDatasets
+
+## 准备输入数据
+f = "data/debug.nc"
+# fout = "data/debug.output.nc"
+
+df_in = read_nc(f)
+names(df_in)
+
+@time dict = load("data/debug.jld2");
+@time df = prepare_wd(dict, f); # vars: 27 -> 43
+
+@time spac = prepare_spac(dict);
+```
+
+```{julia}
+@time df_out = run_model!(spac, df; use_sif=false);
+fwrite(df_out, "data/OUTPUT_V2.csv")
+```
+
+# 2. 绘图
+
+```{r}
+library(ggplot2)
+library(Ipaper)
+library(data.table)
+
+## 把数据转为daily
+date <- seq(make_datetime(2010), make_datetime(2011) - dhours(1), by = "hour")
+
+df1 <- fread("./data/OUTPUT.csv") %>% cbind(date, .)
+df2 <- fread("./data/OUTPUT_V2.csv") %>% cbind(date, .)
+
+d1 <- df1[, map(.SD, mean, na.rm = T), .(date = as_date(date))]
+d2 <- df2[, map(.SD, mean, na.rm = T), .(date = as_date(date))]
+
+## convert to daily
+df_hour <- melt_list(listk(v0 = df1, v1 = df2), "version") |>
+    melt(c("version", "date"))
+
+df_day <- melt_list(listk(v0 = d1, v1 = d2), "version") |>
+    melt(c("version", "date"))
+
+p <- ggplot(df_day, aes(date, value, color = version)) +
+    geom_line() +
+    facet_wrap(~variable, scales = "free_y")
+
+write_fig(p, "d:/Figure1_Land.pdf", 10, 5)
+```
+
+## 2.1. bias
+
+```{r}
+.d1 = df1 |> select(-date)
+.d2 = df2 |> select(-date)
+
+d <- ((.d1 - .d2) / .d1 * 100) %>% mutate(date)
+df <- melt(d, "date")
+
+p <- ggplot(df, aes(date, value)) +
+    geom_line() +
+    facet_wrap(~variable, scales = "free_y")
+
+write_fig(p, "d:/Figure1_Land_diff.pdf", 10, 5)
+```

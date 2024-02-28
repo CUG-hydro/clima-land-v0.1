@@ -1,5 +1,4 @@
 """
-
     run_time_step!(spac::SPACMono{FT}, dfr::DataFrame) where {FT<:AbstractFloat}
 
 Run CliMA Land in a time step, given
@@ -14,6 +13,9 @@ function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinear
     # read the data out of dataframe row to reduce memory allocation
     _df_dif::FT = dfr.RAD_DIF
     _df_dir::FT = dfr.RAD_DIR
+
+    An_prev::FT = 0
+    T_prev::FT = 0
 
     # compute beta factor (based on Psoil, so canopy does not matter)
     _βm = spac_beta_max(spac, beta)
@@ -30,11 +32,28 @@ function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinear
             _iPS.g_sw .= 0 # Stomatal conductance to water H₂O
             gsw_control!(spac.photo_set, _iPS, _iEN)
         else
+            # An依赖Ci, Ci依赖An，所以要迭代
+            # 可以以Ci为标准减少迭代次数
+            # (Ci - Ci_prev) / Ci_prev < 0.1%
+            
+            # An_change
             for _ in 1:30
+                # GPP(spac) + 
                 gas_exchange!(spac.photo_set, _iPS, _iEN, GswDrive())
                 update_gsw!(spac, spac.stomata_model, _i_can, FT(120); β=_βm) # 求解gsw, 更新叶片导度
                 # prognostic_gsw!(spac.plant_ps[_i_can], spac.envirs[_i_can], spac.stomata_model, βm, FT(120))
                 gsw_control!(spac.photo_set, _iPS, _iEN)
+
+                # 稳态时，提前跳出
+                An = CNPP(_iPS)  # CNPP(_iPS), 这一块意义不大
+                rel_An = abs(An - An_prev) / An * 100
+
+                T = T_VEG(_iPS, _iEN)
+                rel_T = abs(T - T_prev) / T * 100
+
+                max(rel_An, rel_T) < 0.1 && break # 提前到达稳态                
+                An_prev = An
+                T_prev = T
             end
         end
     end

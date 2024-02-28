@@ -40,5 +40,6 @@ include("quantities/photosynthesis.jl");
 
 include("wind.jl");
 
+export T_VEG, PPAR, GPP, CNPP, A_GROSS
 
 end # module

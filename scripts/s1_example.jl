@@ -16,8 +16,11 @@ names(df_in)
 
 @time spac = prepare_spac(dict);
 @time df_out = run_model!(spac, df; use_sif=false);
-fwrite(df_out, "data/OUTPUT.csv")
+fwrite(df_out, "data/OUTPUT_V2.csv")
 
+# 27.185314, 可以快三倍
+
+## 
 
 # FT=Float64
 
