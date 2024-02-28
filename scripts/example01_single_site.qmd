@@ -2,9 +2,11 @@
 ```{julia}
 using Revise
 includet("main_pkgs.jl")
-using RTableTools
+# using RTableTools
 # using NCDatasets
+```
 
+```{julia}
 ## 准备输入数据
 f = "data/debug.nc"
 # fout = "data/debug.output.nc"

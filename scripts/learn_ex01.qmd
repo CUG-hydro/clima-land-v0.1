@@ -1,0 +1,27 @@
+# 1. 转模型
+> 学习辐射传输模块
+
+```{julia}
+using Revise
+includet("main_pkgs.jl")
+# using RTableTools
+# using NCDatasets
+```
+
+```{julia}
+## 准备输入数据
+f = "data/debug.nc"
+df_in = read_nc(f)
+names(df_in)
+
+@time dict = load("data/debug.jld2");
+@time df = prepare_wd(dict, f); # vars: 27 -> 43
+
+@time spac = prepare_spac(dict);
+```
+
+
+<!-- ```{julia}
+@time df_out = run_model!(spac, df; use_sif=false);
+fwrite(df_out, "data/OUTPUT_V2.csv")
+``` -->

@@ -1,3 +1,8 @@
+function update_gsw!(spac::SPACMono{FT}, sm::ESMMedlyn{FT}, ind::Int, δt::FT; β::FT=FT(1)) where {FT<:AbstractFloat}
+    prognostic_gsw!(spac.plant_ps[ind], spac.envirs[ind], sm, β, δt)
+end
+
+
 """
     run_time_step!(spac::SPACMono{FT}, dfr::DataFrame) where {FT<:AbstractFloat}
 
