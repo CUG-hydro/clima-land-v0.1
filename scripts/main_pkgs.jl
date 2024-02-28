@@ -1,11 +1,10 @@
-# This file is meant for CliMA Land v0.1 example
 using DataFrames: DataFrame, DataFrameRow
 using Dates: isleapyear
 using JLD2: load
 
-
-using RTableTools
+using Revise
 using ProgressMeter
+using UnPack
 
 using NetcdfIO: read_nc, save_nc!
 using PkgUtility: month_days, nanmean
@@ -17,75 +16,19 @@ using Land.SoilPlantAirContinuum: CNPP, GPP, PPAR, SPACMono, T_VEG, initialize_s
     update_par!, update_sif!, zenith_angle
 using Land.StomataModels: BetaGLinearPsoil, ESMMedlyn, GswDrive, gas_exchange!, gsw_control!, prognostic_gsw!
 
+using Land
+using Land.CanopyLayers
+using Land.Photosynthesis
+using Land.PlantHydraulics
+using Land.SoilPlantAirContinuum
+using Land.StomataModels
+using PkgUtility
+using Test
 
-DF_VARIABLES = ["F_H2O", "F_CO2", "F_GPP", "SIF683", "SIF740", "SIF757", "SIF771", "NDVI", "EVI", "NIRv"];
+# DF_VARIABLES = ["F_H2O", "F_CO2", "F_GPP", "SIF683", "SIF740", "SIF757", "SIF771", "NDVI", "EVI", "NIRv"];
+DF_VARIABLES = ["F_H2O", "F_CO2", "F_GPP"];
 
-
-"""
-
-    prepare_wd(dict::Dict, wd_file::String)
-
-Prepare weather driver dataframe to feed CliMA Land, given
-- `dict` Dictionary that store grid information
-- `wd_file` Weather driver file
-
-"""
-function prepare_wd(dict::Dict, wd_file::String)
-    _df_in = read_nc(wd_file)
-
-    # compute T_MEAN based on the weather driver
-    _df_in[!, "CO2"] .= 0.0
-    _df_in[!, "Chlorophyll"] .= 0.0
-    _df_in[!, "LAI"] .= 0.0
-    _df_in[!, "Vcmax"] .= 0.0
-    _df_in[!, "T_MEAN"] .= 0.0
-    for _i in eachindex(_df_in.T_MEAN)
-        if _i < 240
-            _df_in[_i, "T_MEAN"] = nanmean(max.(_df_in.T_AIR[1:_i], _df_in.T_LEAF[1:_i]))
-        else
-            _df_in[_i, "T_MEAN"] = nanmean(max.(_df_in.T_AIR[_i-239:_i], _df_in.T_LEAF[_i-239:_i]))
-        end
-    end
-
-    #
-    # extropolate the time series based on input variable dimensions, dimensions must be within supported settings
-    #     1. extropolate the data to 1D resolution
-    #     2. extropolate the data to 1H resolution
-    #
-    _year = dict["year"]
-    _days = isleapyear(_year) ? 366 : 365
-    @inline nt_to_1h(label::String) = (
-        _dat_in = dict[label];
-        @assert length(_dat_in) in [366, 365, 53, 52, 46, 12, 1] "Dataset length not supported";
-
-        if length(_dat_in) == 1
-            _dat_1d = repeat([_dat_in;]; inner=_days)
-        elseif length(_dat_in) == 12
-            _dat_1d = [([repeat(_dat_in[_m:_m], month_days(_year, _m)) for _m in 1:12]...)...]
-        elseif length(_dat_in) == 46
-            _dat_1d = repeat(_dat_in; inner=8)[1:_days]
-        elseif length(_dat_in) in [52, 53]
-            _dat_1d = repeat([_dat_in; _dat_in[end]]; inner=7)[1:_days]
-        elseif length(_dat_in) in [365, 366]
-            _dat_1d = [_dat_in; _dat_in[end]][1:_days]
-        end;
-
-        return repeat(_dat_1d; inner=24)
-    )
-    _df_in[!, "CO2"] .= nt_to_1h("co2_concentration")
-    _df_in[!, "Chlorophyll"] .= nt_to_1h("chlorophyll")
-    _df_in[!, "CI"] .= nt_to_1h("clumping_index")
-    _df_in[!, "LAI"] .= nt_to_1h("leaf_area_index")
-    _df_in[!, "Vcmax"] .= nt_to_1h("vcmax")
-
-    # add the fields to store outputs
-    for _label in DF_VARIABLES
-        _df_in[!, _label] .= 0.0
-    end
-
-    return _df_in
-end
-
+include("main_input.jl")
 
 
 """
@@ -267,107 +210,6 @@ Wrapper function to use prognostic_gsw!, given
 """
 function update_gsw!(spac::SPACMono{FT}, sm::ESMMedlyn{FT}, ind::Int, δt::FT; β::FT=FT(1)) where {FT<:AbstractFloat}
     prognostic_gsw!(spac.plant_ps[ind], spac.envirs[ind], sm, β, δt)
-    return nothing
 end
 
-
-"""
-
-    run_time_step!(spac::SPACMono{FT}, dfr::DataFrame) where {FT<:AbstractFloat}
-
-Run CliMA Land in a time step, given
-- `spac` Soil plant air continuum struct
-- `dfr` Weather driver dataframe row
-- `ind` Time index
-
-"""
-function run_time_step!(spac::SPACMono{FT}, dfr::DataFrameRow, beta::BetaGLinearPsoil{FT}) where {FT<:AbstractFloat}
-    # read the data out of dataframe row to reduce memory allocation
-    _df_dif::FT = dfr.RAD_DIF
-    _df_dir::FT = dfr.RAD_DIR
-
-    # compute beta factor (based on Psoil, so canopy does not matter)
-    _βm = spac_beta_max(spac, beta)
-
-    # calculate leaf level flux per canopy layer
-    for _i_can in 1:spac.n_canopy
-        _iEN = spac.envirs[_i_can]
-        _iPS = spac.plant_ps[_i_can]
-
-        # set gsw to 0 or iterate for 30 times to find steady state solution
-        if _df_dir + _df_dif < 10
-            _iPS.APAR .= 0
-            _iPS.g_sw .= 0
-            gsw_control!(spac.photo_set, _iPS, _iEN)
-        else
-            for _ in 1:30
-                gas_exchange!(spac.photo_set, _iPS, _iEN, GswDrive())
-                update_gsw!(spac, spac.stomata_model, _i_can, FT(120); β=_βm)
-                gsw_control!(spac.photo_set, _iPS, _iEN)
-            end
-        end
-    end
-
-    # calculate the SIF if there is sunlight
-    if _df_dir + _df_dif >= 10
-        update_sif!(spac)
-        dfr.SIF683 = SIF_WL(spac.can_rad, spac.wl_set, FT(682.5))
-        dfr.SIF740 = SIF_740(spac.can_rad, spac.wl_set)
-        dfr.SIF757 = SIF_WL(spac.can_rad, spac.wl_set, FT(758.7))
-        dfr.SIF771 = SIF_WL(spac.can_rad, spac.wl_set, FT(770.0))
-        dfr.NDVI = NDVI(spac.can_rad, spac.wl_set)
-        dfr.EVI = EVI(spac.can_rad, spac.wl_set)
-        dfr.NIRv = NIRv(spac.can_rad, spac.wl_set)
-    end
-
-    # save the total flux into the DataFrame
-    dfr.F_H2O = T_VEG(spac)
-    dfr.F_CO2 = CNPP(spac)
-    dfr.F_GPP = GPP(spac)
-
-    return nothing
-end
-
-
-"""
-
-    run_model!(spac::SPACMono{FT}, df::DataFrame, nc_out::String) where {FT<:AbstractFloat}
-
-Run CliMA Land at a site for the enture year, given
-- `spac` Soil plant air continuum struct
-- `df` Weather driver dataframe
-- `nc_out` File path to save the model output
-
-"""
-function run_model!(spac::SPACMono{FT}, df::DataFrame) where {FT<:AbstractFloat}
-    _in_rad_bak = deepcopy(spac.in_rad)
-    _in_dir = _in_rad_bak.E_direct' * spac.wl_set.dWL / 1000
-    _in_dif = _in_rad_bak.E_diffuse' * spac.wl_set.dWL / 1000
-    _deepcopies = [_in_rad_bak, _in_dir, _in_dif]
-    _beta_g = BetaGLinearPsoil{FT}()
-
-    
-    # set up memory
-    _spac_mem = SPACMemory{FT}()
-
-    # iterate through the time steps
-    @showprogress for _dfr in eachrow(df)
-        prescribe_parameters!(spac, _dfr, _spac_mem, _deepcopies)
-        run_time_step!(spac, _dfr, _beta_g)
-    end
-    # save simulation results to hard drive
-    # save_nc!(nc_out, df[:, DF_VARIABLES])
-    DF_VARIABLES = ["F_H2O", "F_CO2", "F_GPP"]
-    df[:, DF_VARIABLES]
-    # return nothing
-end
-
-
-indir = "data"
-@time dict = load("$indir/debug.jld2");
-@time wddf = prepare_wd(dict, "$indir/debug.nc");
-@time spac = prepare_spac(dict);
-@time df_out = run_model!(spac, wddf);
-
-fwrite(df_out, "data/OUTPUT.csv")
-# @time run_model!(spac, wddf, "$(@__DIR__)/debug.output.nc");
+includet("run_time_step!.jl")
