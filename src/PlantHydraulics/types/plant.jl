@@ -107,7 +107,7 @@ trunk, and multiple branch and canopy layers.
 # Fields
 $(TYPEDFIELDS)
 """
-mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
+@with_kw mutable struct TreeLikeOrganism{FT} <: AbstractPlantOrganism{FT}
     # structre information
     "Root Layers"
     n_root  ::Int

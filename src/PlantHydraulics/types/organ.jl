@@ -29,7 +29,7 @@ A struct that contains leaf hydraulics information.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
+@with_kw mutable struct LeafHydraulics{FT} <: AbstractHydraulicOrgan{FT}
     # number of xylem slices
     N::Int = 5
 

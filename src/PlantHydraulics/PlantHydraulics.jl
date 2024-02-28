@@ -1,5 +1,6 @@
 module PlantHydraulics
 
+using Parameters
 using ConstrainedRootSolvers: NewtonBisectionMethod, ReduceStepMethodND,
       ResidualTolerance, SolutionTolerance, SolutionToleranceND, find_peak,
       find_zero

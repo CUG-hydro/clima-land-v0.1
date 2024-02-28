@@ -11,7 +11,7 @@ A struct for canopy optical properties
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct CanopyOpticals{FT}
+@with_kw mutable struct CanopyOpticals{FT}
     # local storage of dimension information
     "Number of azimuth angles"
     nAzi::Int = 36

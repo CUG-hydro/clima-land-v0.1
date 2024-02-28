@@ -33,13 +33,11 @@ function gsw_control!(
 ) where {FT<:AbstractFloat}
     # if g_sw is low than g_min
     if canopyi.g_sw[ind] < canopyi.g_min
-        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind,
-                      canopyi.g_min);
+        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind, canopyi.g_min);
     elseif canopyi.g_sw[ind] > canopyi.g_max
-        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind,
-                      canopyi.g_max);
+        gas_exchange!(photo_set, canopyi, envir, GswDrive(), ind, canopyi.g_max);
     end
-
+    
     return nothing
 end
 

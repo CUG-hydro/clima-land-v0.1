@@ -11,7 +11,7 @@ A struct of leaf biological parameters
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct LeafBios{FT}
+@with_kw mutable struct LeafBios{FT}
     # whether to prescribe the leaf reflectance and transmission
     "Prescribe leaf reflectance and transmission"
     prescribe::Bool = false

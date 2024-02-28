@@ -1,5 +1,6 @@
 module CanopyLayers
 
+using Parameters
 using LazyArtifacts
 
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak

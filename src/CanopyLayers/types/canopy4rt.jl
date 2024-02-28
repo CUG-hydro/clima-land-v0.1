@@ -11,7 +11,7 @@ A canopy struct for the radiation transfer module
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct Canopy4RT{FT<:AbstractFloat}
+@with_kw mutable struct Canopy4RT{FT<:AbstractFloat}
     # local storage of dimension information
     "Number of canopy layers"
     nLayer::Int = 20

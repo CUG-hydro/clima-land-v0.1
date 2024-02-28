@@ -1,5 +1,6 @@
 module SoilPlantAirContinuum
 
+using Parameters
 using ConstrainedRootSolvers: ReduceStepMethodND, SolutionToleranceND, find_peak
 using DocStringExtensions: TYPEDFIELDS
 using EmeraldConstants: GAS_R, GRAVITY, K_STEFAN, K_VON_KARMAN, M_H₂O, P_ATM, RT₂₅, T₀, T₂₅, YEAR_D, ρ_H₂O

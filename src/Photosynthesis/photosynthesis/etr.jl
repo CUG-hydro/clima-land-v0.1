@@ -35,10 +35,10 @@ leaf_ETR!(photo_set::C3ParaSet{FT}, leaf::Leaf{FT}) where {FT<:AbstractFloat} = 
     (; APAR, maxPSII, Jmax, PSII_frac) = leaf;
     (; Θ_J) = photo_set;
 
-    _Jp = PSII_frac * maxPSII * APAR;
-    _J  = lower_quadratic(Θ_J, -(_Jp + Jmax), _Jp * Jmax);
+    I_PSII = PSII_frac * maxPSII * APAR; 
+    _J = lower_quadratic(Θ_J, -(I_PSII + Jmax), I_PSII * Jmax); # I_PSII, CLM5 Tech, Eq 9.6
 
-    leaf.J_pot = _Jp;
+    leaf.J_pot = I_PSII;
     leaf.J     = _J;
 
     return nothing

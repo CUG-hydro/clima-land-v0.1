@@ -11,7 +11,7 @@ Struct that mono species SoilPlantAirContinuum system.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct SPACMono{FT<:AbstractFloat}
+@with_kw mutable struct SPACMono{FT<:AbstractFloat}
     "Input file for SPAC spectra used in wl_set and soil_opt"
     opti_file::String = LAND_2021
 
