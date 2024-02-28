@@ -45,7 +45,7 @@ Parameter sets for C3 photosynthesis.
 # Fields
 $(TYPEDFIELDS)
 """
-mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
+@with_kw mutable struct C3ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Jmax temperature dependency"
     JT::AbstractTDParameterSet{FT}
     "Kc temperature dependency"
@@ -81,7 +81,7 @@ Parameter sets for C3 photosynthesis.
 # Fields
 $(TYPEDFIELDS)
 """
-mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
+@with_kw mutable struct C4ParaSet{FT<:AbstractFloat} <: AbstractPhotoModelParaSet{FT}
     "Kpep temperature dependency"
     KpT::AbstractTDParameterSet{FT}
     "Respiration temperature dependency"

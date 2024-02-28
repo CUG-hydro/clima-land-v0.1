@@ -1,5 +1,6 @@
 module Photosynthesis
 
+using Parameters
 using DocStringExtensions: TYPEDFIELDS
 using EmeraldConstants: GAS_R, RT₂₅, T₀, T₂₅
 using PkgUtility: lower_quadratic

@@ -11,7 +11,7 @@ Struct to store leaf information.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct Leaf{FT<:AbstractFloat}
+@with_kw mutable struct Leaf{FT<:AbstractFloat}
     # Temperature related
     "Temperature `[K]`"
     T::FT = 298.15

@@ -81,7 +81,7 @@ Linear β function for g1 based on soil water potential.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaGLinearPleaf{FT} <: AbstractBetaG{FT}
+@with_kw mutable struct BetaGLinearPleaf{FT} <: AbstractBetaG{FT}
     "Upper bound of Pleaf `[MPa]`"
     p_max::FT = 0
     "Lower bound of Pleaf `[MPa]`"
@@ -99,7 +99,7 @@ Linear β function for g1 based on soil water potential.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaGLinearPsoil{FT} <: AbstractBetaG{FT}
+@with_kw mutable struct BetaGLinearPsoil{FT} <: AbstractBetaG{FT}
     "Upper bound of Psoil `[MPa]`"
     p_max::FT = 0
     "Lower bound of Psoil `[MPa]`"
@@ -117,7 +117,7 @@ Linear β function for g1 based on soil water content.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaGLinearSWC{FT} <: AbstractBetaG{FT}
+@with_kw mutable struct BetaGLinearSWC{FT} <: AbstractBetaG{FT}
     "Upper bound of SWC"
     swc_max::FT = 1
     "Lower bound of SWC"
@@ -184,7 +184,7 @@ Linear β function for Vcmax based on soil water potential.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaVLinearPleaf{FT} <: AbstractBetaG{FT}
+@with_kw mutable struct BetaVLinearPleaf{FT} <: AbstractBetaG{FT}
     "Upper bound of Pleaf `[MPa]`"
     p_max::FT = 0
     "Lower bound of Pleaf `[MPa]`"
@@ -202,7 +202,7 @@ Linear β function for Vcmax based on soil water potential.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaVLinearPsoil{FT} <: AbstractBetaV{FT}
+@with_kw mutable struct BetaVLinearPsoil{FT} <: AbstractBetaV{FT}
     "Upper bound of Psoil `[MPa]`"
     p_max::FT = 0
     "Lower bound of Psoil `[MPa]`"
@@ -220,7 +220,7 @@ Linear β function for Vcmax based on soil water content.
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct BetaVLinearSWC{FT} <: AbstractBetaV{FT}
+@with_kw mutable struct BetaVLinearSWC{FT} <: AbstractBetaV{FT}
     "Upper bound of SWC"
     swc_max::FT = 1
     "Lower bound of SWC"

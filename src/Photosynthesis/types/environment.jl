@@ -12,7 +12,7 @@ Struct to store environmental conditions in each air layer corresponds to one
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct AirLayer{FT<:AbstractFloat}
+@with_kw mutable struct AirLayer{FT<:AbstractFloat}
     "Air temperature `[K]`"
     t_air::FT = 298.15
 

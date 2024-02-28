@@ -11,7 +11,7 @@ Struct to store leaf information (multi-dimensional).
 # Fields
 $(TYPEDFIELDS)
 """
-Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
+@with_kw mutable struct CanopyLayer{FT<:AbstractFloat}
     # CanopyLayer photosynthesis system
     "leaf photosynthesis system"
     ps  ::Leaf{FT} = Leaf{FT}()

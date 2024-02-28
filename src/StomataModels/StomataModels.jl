@@ -1,5 +1,6 @@
 module StomataModels
 
+using Parameters
 using ConstrainedRootSolvers: NewtonBisectionMethod, SolutionTolerance, find_zero
 using DocStringExtensions: TYPEDFIELDS
 using EmeraldConstants: CP_D_MOL, K_STEFAN, M_H₂O, T₂₅
