@@ -45,7 +45,7 @@ makedocs(
 
 # deploy the docs to Github gh-pages
 deploydocs(
-    repo = "github.com/solicormosia/clima-land-v0.1.git",
+    repo = "github.com/silicormosia/clima-land-v0.1.git",
     target = "build",
     devbranch = "main",
     push_preview = true,
