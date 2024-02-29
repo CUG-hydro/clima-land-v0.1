@@ -26,9 +26,12 @@ end;
     include("features/clm5_mode.jl")
 end;
 
-# 这里为何没有考虑冠层辐射传输？
-canopy = CanopyLayer{FT}()
-envir = AirLayer{FT}()
 
-CNPP(canopy)
-T_VEG(envir, canopy)
+@testset "CNPP, GPP, T_VEG" begin
+    canopy = CanopyLayer{FT}()
+    envir = AirLayer{FT}()
+
+    CNPP(canopy)
+    GPP(canopy)
+    T_VEG(canopy, envir)
+end

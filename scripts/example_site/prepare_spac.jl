@@ -14,14 +14,15 @@ function prepare_spac(dict::Dict; FT=Float64)
     _sm = ESMMedlyn{FT}()
 
     # use JULES soil depth 0.00 -- 0.10 -- 0.35 -- 1.00 -- 3.00 m, and assume 2 m deep root (z_root = -2) for all the sites
-    _soil_bounds = FT[0, -0.1, -0.35, -1, -3]
-    _z_canopy = max(FT(0.1), dict["canopy_height"])
-    _Δz = _z_canopy / 20
-    _air_bounds = collect(0:_Δz:_z_canopy+2*_Δz)
-    _plant_hs = create_tree(FT(-2), _z_canopy / 2, _z_canopy, _soil_bounds, _air_bounds)
+    soil_bounds = FT[0, -0.1, -0.35, -1, -3]
+    z_canopy = max(FT(0.1), dict["canopy_height"])
+    Δz = z_canopy / 20
+    air_bounds = collect(0:Δz:z_canopy+2*Δz)
+    plant_hs = create_tree(FT(-2), z_canopy / 2, z_canopy, soil_bounds, air_bounds)
 
     # create a SPACMono struct, redefine the wavelength limits for PAR if ePAR is true
-    _node = SPACMono{FT}(soil_bounds=_soil_bounds, air_bounds=_air_bounds, z_canopy=_z_canopy, z_root=-2, plant_hs=_plant_hs, latitude=_lat, longitude=_lon, stomata_model=_sm)
+    _node = SPACMono{FT}(;soil_bounds, air_bounds, z_canopy, z_root=-2, plant_hs, 
+        latitude=_lat, longitude=_lon, stomata_model=_sm)
 
     for _iPS in _node.plant_ps
         _iPS.g_min = eps(FT)
@@ -32,11 +33,11 @@ function prepare_spac(dict::Dict; FT=Float64)
 
     # update soil type information per layer
     for _i in eachindex(_node.plant_hs.roots)
-        _α = dict["soil_vg_α"][_i]
-        _n = dict["soil_vg_n"][_i]
-        _Θr = dict["soil_vg_Θr"][_i]
-        _Θs = dict["soil_vg_Θs"][_i]
-        _node.plant_hs.roots[_i].sh = VanGenuchten{FT}(stype="JULES", α=_α, n=_n, Θs=_Θs, Θr=_Θr)
+        α = dict["soil_vg_α"][_i]
+        n = dict["soil_vg_n"][_i]
+        Θr = dict["soil_vg_Θr"][_i]
+        Θs = dict["soil_vg_Θs"][_i]
+        _node.plant_hs.roots[_i].sh = VanGenuchten{FT}(;stype="JULES", α, n, Θs, Θr)
     end
 
     # update leaf mass per area (from m² kg⁻¹ to g cm⁻²)

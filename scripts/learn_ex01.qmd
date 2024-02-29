@@ -20,8 +20,7 @@ names(df_in)
 @time spac = prepare_spac(dict);
 ```
 
-
-<!-- ```{julia}
+```{julia}
 @time df_out = run_model!(spac, df; use_sif=false);
 fwrite(df_out, "data/OUTPUT_V2.csv")
-``` -->
+```
